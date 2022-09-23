@@ -1,0 +1,284 @@
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  border: none;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: #444;
+  background-color: #f3f3f3;
+  height: 100vh;
+  padding: 2rem;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.welcome {
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.logo {
+  height: 5rem;
+}
+
+.login {
+  display: flex;
+}
+
+.login-input {
+  padding: 0.5rem 2rem;
+  font-size: 1.6rem;
+  font-family: inherit;
+  text-align: center;
+  width: 15rem;
+  border-radius: 10rem;
+  margin-right: 1rem;
+  color: inherit;
+  border: 1px solid #fff;
+  transition: all 0.3s;
+}
+
+.login-input:focus {
+  border-color: #ccc;
+}
+
+.login-input::placeholder {
+  color: #bbb;
+}
+
+.login-btn {
+  background: none;
+  font-size: 2rem;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.login-btn:hover,
+.login-btn:focus,
+.btn-sort:focus,
+.btn-sort:hover {
+  color: #777;
+}
+
+.app {
+  position: relative;
+  max-width: 100rem;
+  margin: 4rem auto;
+  display: grid;
+  grid-template-columns: 4fr 3fr;
+  grid-template-rows: auto repeat(3, 15rem) auto;
+  gap: 2rem;
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+.balance {
+  grid-column: 1 / span 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.balance-label {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: -0.2rem;
+}
+
+.balance-date {
+  font-size: 1.4rem;
+  color: #888;
+}
+
+.balance-value {
+  font-size: 4.5rem;
+  font-weight: 400;
+}
+
+.movements {
+  grid-row: 2 / span 3;
+  background-color: #fff;
+  overflow-y: scroll;
+}
+
+.movements-row {
+  padding: 2.25rem 4rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.movements-type {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #fff;
+  padding: 0.1rem 1rem;
+  border-radius: 10rem;
+  margin-right: 2rem;
+}
+
+.movements-date {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #666;
+}
+
+.movements-type-deposit {
+  background-color: #00b79f;
+}
+
+.movements-type-withdrawal {
+  background-color: #f3442a;
+}
+
+.movements-value {
+  font-size: 1.7rem;
+  margin-left: auto;
+}
+
+.summary {
+  grid-row: 5/6;
+  display: flex;
+  align-items: baseline;
+  padding: 0 0.3rem;
+  margin-top: 1rem;
+}
+
+.summary-label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-right: 0.8rem;
+}
+
+.summary-value {
+  font-size: 2.2rem;
+  margin-right: 2.5rem;
+}
+
+.summary-value-in,
+.summary-value-interest {
+  color: #00b79f;
+}
+
+.summary-value-out {
+  color: #f3442a;
+}
+
+.btn-sort {
+  margin-left: auto;
+  background: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.operation {
+  border-radius: 1rem;
+  padding: 3rem 4rem;
+  color: #333;
+}
+
+.operation-transfer {
+  background-color: #00b79f;
+}
+
+.operation-loan {
+  background-color: #f3442a;
+}
+
+.operation-close {
+  background-color: #fdb850;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 2.5fr 2.5fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.4rem 1rem;
+}
+
+.form.form-loan {
+  grid-template-columns: 2.5fr 1fr 2.5fr;
+}
+
+.form-label-loan {
+  grid-row: 2;
+}
+
+.form-input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+  font-family: inherit;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #333;
+  padding: 0.3rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.form-label {
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.form-btn {
+  border-radius: 0.5rem;
+  font-size: 1.8rem;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.form-btn:focus {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.logout-timer {
+  padding: 0 0.3rem;
+  margin-top: 2rem;
+  text-align: right;
+  font-size: 1.3rem;
+}
+
+.timer {
+  font-weight: 600;
+}
+
+footer {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #888;
+  padding-top: 3rem;
+}
