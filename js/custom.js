@@ -8,12 +8,16 @@ const accounts = [
     movements: [3500, 1000, -800, 1200, 3600, -1500, 500, 2500, -5000, 1800],
     interestRate: 1.5,
     password: 4321,
+    currency: "USD",
+    locale: "en-US",
   },
   {
     owner: "Anower Hossen",
     movements: [4500, 500, -750, 200, 3200, -1800, 500, 1200, -1750, 1800],
     interestRate: 1.5,
     password: 8765,
+    currency: "EUR",
+    locale: "en-GB",
   },
 ];
 
@@ -56,6 +60,16 @@ function updateUI(currentAccount) {
   displayBalance(currentAccount);
 }
 
+///////////////////////////////////////////////////////////////////////////
+//formating currency
+///////////////////////////////////////////////////////////////////////
+
+function formatCurrency(value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: " currency",
+    currency: currency,
+  }).format(value);
+}
 // /////////////////////////////////////////////////////////////////////
 // // Username
 // /////////////////////////////////////////////////////////////////////
@@ -84,18 +98,22 @@ btnLogin.addEventListener("click", function (e) {
     (account) => account.username === inputLoginUsername.value
   );
   if (currentAccount?.password === Number(inputLoginPassword.value)) {
-    // Display UI and welcome
-    labelWelcome.textContent = `Welcome back, ${currentAccount.owner
-      .split(" ")
-      .at(0)}`;
-    containerApp.style.opacity = 1;
+    setTimeout(() => {
+      // Display UI and welcome
+      labelWelcome.textContent = `Welcome back, ${currentAccount.owner
+        .split(" ")
+        .at(0)}`;
+      containerApp.style.opacity = 1;
 
-    //update UI
-    updateUI(currentAccount);
+      //update UI
+      updateUI(currentAccount);
+    }, 3000);
   } else {
-    // Hide UI and warning sms
-    labelWelcome.textContent = "Login failed!";
-    containerApp.style.opacity = 0;
+    setTimeout(() => {
+      // Hide UI and warning sms
+      labelWelcome.textContent = "Login failed!";
+      containerApp.style.opacity = 0;
+    }, 3000);
   }
 
   // Clear fields
@@ -108,8 +126,6 @@ btnLogin.addEventListener("click", function (e) {
 /////////////////////////////////////////////////////////////////////
 function displayMovements(account, sort = false) {
   containerMovements.innerHTML = "";
-  console.log(account);
-
   const moves = sort
     ? account.movements.slice(0).sort((a, b) => a - b)
     : account.movements;
@@ -117,13 +133,19 @@ function displayMovements(account, sort = false) {
   moves.forEach((move, i) => {
     const type = move > 0 ? "deposit" : "withdrawal";
 
+    // const formattedMove = formatCurrency(
+    //   move,
+    //   account.locale,
+    //   account.currency
+    // );
+
     const html = `
         <div class="movements-row">
           <div class="movements-type movements-type-${type}">${
       i + 1
     } ${type}</div>
           <div class="movements-date">5 days ago</div>
-          <div class="movements-value">${move}$</div>
+          <div class="movements-value">${move}</div>
         </div>
     `;
 
@@ -140,13 +162,21 @@ function displaySummary(account) {
   const incomes = account.movements
     .filter((move) => move > 0)
     .reduce((acc, deposit) => acc + deposit, 0);
-  labelSumIn.textContent = `${incomes}$`;
+  labelSumIn.textContent = formatCurrency(
+    incomes,
+    account.locale,
+    account.currency
+  );
 
   // outcome
   const outcomes = account.movements
     .filter((move) => move < 0)
     .reduce((acc, withdrawal) => acc + withdrawal, 0);
-  labelSumOut.textContent = `${Math.abs(outcomes)}$`;
+  labelSumOut.textContent = formatCurrency(
+    Math.abs(outcomes),
+    account.locale,
+    account.currency
+  );
 
   //interest
   const interest = account.movements
@@ -155,7 +185,11 @@ function displaySummary(account) {
     .filter((interest) => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0);
 
-  labelSumInterest.textContent = `${interest}$`;
+  labelSumInterest.textContent = formatCurrency(
+    interest,
+    account.locale,
+    account.currency
+  );
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -165,7 +199,11 @@ function displaySummary(account) {
 function displayBalance(account) {
   account.balance = account.movements.reduce((acc, move) => acc + move, 0);
 
-  labelBalance.textContent = `${account.balance}$`;
+  labelBalance.textContent = formatCurrency(
+    account.balance,
+    account.locale,
+    account.currency
+  );
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -191,15 +229,19 @@ btnTransfer.addEventListener("click", function (e) {
     currentAccount.username !== receiverAccount?.username &&
     receiverAccount
   ) {
-    // Transfer money
-    currentAccount.movements.push(-amount);
-    receiverAccount.movements.push(amount);
-    // Update UI
-    updateUI(currentAccount);
-    // Show message
-    labelWelcome.textContent = "Transaction successful!";
+    setTimeout(() => {
+      // Transfer money
+      currentAccount.movements.push(-amount);
+      receiverAccount.movements.push(amount);
+      // Update UI
+      updateUI(currentAccount);
+      // Show message
+      labelWelcome.textContent = "Transaction successful!";
+    }, 3000);
   } else {
-    labelWelcome.textContent = "Transaction failed!";
+    setTimeout(() => {
+      labelWelcome.textContent = "Transaction failed!";
+    }, 3000);
   }
 });
 
@@ -216,14 +258,18 @@ btnLoan.addEventListener("click", function (e) {
     amount > 0 &&
     currentAccount.movements.some((move) => move >= amount * 0.1)
   ) {
-    // add positive movement into current account
-    currentAccount.movements.push(amount);
-    //update ui
-    updateUI(currentAccount);
-    // message
-    labelWelcome.textContent = "loan successful";
+    setTimeout(() => {
+      // add positive movement into current account
+      currentAccount.movements.push(amount);
+      //update ui
+      updateUI(currentAccount);
+      // message
+      labelWelcome.textContent = "loan successful";
+    }, 3000);
   } else {
-    labelWelcome.textContent = "loan not successful";
+    setTimeout(() => {
+      labelWelcome.textContent = "loan not successful";
+    }, 3000);
   }
 
   // clear
@@ -246,16 +292,20 @@ btnClose.addEventListener("click", function (e) {
       (account) => account.username === currentAccount.username
     );
 
-    // delete
-    accounts.splice(index, 1);
+    setTimeout(() => {
+      // delete
+      accounts.splice(index, 1);
 
-    // hide ui
-    containerApp.style.opacity = 0;
+      // hide ui
+      containerApp.style.opacity = 0;
 
-    // sms
-    labelWelcome.textContent = "account deleted";
+      // sms
+      labelWelcome.textContent = "account deleted";
+    }, 3000);
   } else {
-    labelWelcome.textContent = "delete can not be done";
+    setTimeout(() => {
+      labelWelcome.textContent = "delete can not be done";
+    }, 3000);
   }
 
   // clear fileds
