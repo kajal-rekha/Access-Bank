@@ -1,4 +1,5 @@
 "use strict";
+
 /////////////////////////////////////////////////////////////
 // Data
 /////////////////////////////////////////////////////////////
@@ -8,6 +9,18 @@ const accounts = [
     movements: [3500, 1000, -800, 1200, 3600, -1500, 500, 2500, -5000, 1800],
     interestRate: 1.5,
     password: 4321,
+    movementsDates: [
+      "2021-11-18T21:31:17.178Z",
+      "2021-12-23T07:42:02.383Z",
+      "2022-01-29T09:15:04.904Z",
+      "2022-04-01T10:17:24.185Z",
+      "2022-07-09T14:11:59.604Z",
+      "2022-09-17T17:01:17.194Z",
+      "2022-09-22T23:36:17.929Z",
+      "2022-09-26T12:51:31.398Z",
+      "2022-09-29T06:41:26.190Z",
+      "2022-09-30T08:11:36.678Z",
+    ],
     currency: "USD",
     locale: "en-US",
   },
@@ -16,6 +29,18 @@ const accounts = [
     movements: [4500, 500, -750, 200, 3200, -1800, 500, 1200, -1750, 1800],
     interestRate: 1.5,
     password: 8765,
+    movementsDates: [
+      "2021-12-11T21:31:17.671Z",
+      "2021-12-27T07:42:02.184Z",
+      "2022-01-06T09:15:04.805Z",
+      "2022-02-14T10:17:24.687Z",
+      "2022-03-13T14:11:59.203Z",
+      "2022-05-18T17:01:17.392Z",
+      "2022-08-22T23:36:17.522Z",
+      "2022-09-26T12:51:31.491Z",
+      "2022-09-29T06:41:26.394Z",
+      "2022-09-30T08:11:36.276Z",
+    ],
     currency: "EUR",
     locale: "en-GB",
   },
@@ -60,17 +85,38 @@ function updateUI(currentAccount) {
   displayBalance(currentAccount);
 }
 
-///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //formating currency
 ///////////////////////////////////////////////////////////////////////
 
 function formatCurrency(value, locale, currency) {
   return new Intl.NumberFormat(locale, {
-    style: " currency",
+    style: "currency",
     currency: currency,
   }).format(value);
 }
-// /////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Days calculation
+///////////////////////////////////////////////////////////////////////////////////
+
+function formatMoveDate(date, locale) {
+  const calculateDays = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (24 * 60 * 60 * 1000));
+
+  const daysPassed = calculateDays(new Date(), date);
+  if (daysPassed === 0) return "Today";
+  if (daysPassed === 1) return "Yesterday";
+  if (daysPassed <= 7) return `${daysPassed} days ago`;
+
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
+/////////////////////////////////////////////////////////////////////////
 // // Username
 // /////////////////////////////////////////////////////////////////////
 
@@ -89,7 +135,7 @@ createUsernames(accounts);
 // Login
 /////////////////////////////////////////////////////////////////////
 
-let currentAccount;
+let currentAccount, timer;
 
 btnLogin.addEventListener("click", function (e) {
   e.preventDefault();
@@ -97,6 +143,7 @@ btnLogin.addEventListener("click", function (e) {
   currentAccount = accounts.find(
     (account) => account.username === inputLoginUsername.value
   );
+
   if (currentAccount?.password === Number(inputLoginPassword.value)) {
     setTimeout(() => {
       // Display UI and welcome
@@ -104,6 +151,26 @@ btnLogin.addEventListener("click", function (e) {
         .split(" ")
         .at(0)}`;
       containerApp.style.opacity = 1;
+
+      // Display date and time
+      const now = new Date();
+
+      const options = {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minutes: "numeric",
+      };
+
+      labelDate.textContent = new Intl.DateTimeFormat(
+        currentAccount.locale,
+        options
+      ).format(now);
+
+      // log out timer
+      if (timer) clearInterval(timer);
+      timer = logOut();
 
       //update UI
       updateUI(currentAccount);
@@ -133,19 +200,22 @@ function displayMovements(account, sort = false) {
   moves.forEach((move, i) => {
     const type = move > 0 ? "deposit" : "withdrawal";
 
-    // const formattedMove = formatCurrency(
-    //   move,
-    //   account.locale,
-    //   account.currency
-    // );
+    const formattedMove = formatCurrency(
+      move,
+      account.locale,
+      account.currency
+    );
+
+    const date = new Date(account.movementsDates[i]);
+    const displayDate = formatMoveDate(date, account.locale);
 
     const html = `
         <div class="movements-row">
           <div class="movements-type movements-type-${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements-date">5 days ago</div>
-          <div class="movements-value">${move}</div>
+          <div class="movements-date">${displayDate}</div>
+          <div class="movements-value">${formattedMove}</div>
         </div>
     `;
 
@@ -172,6 +242,7 @@ function displaySummary(account) {
   const outcomes = account.movements
     .filter((move) => move < 0)
     .reduce((acc, withdrawal) => acc + withdrawal, 0);
+
   labelSumOut.textContent = formatCurrency(
     Math.abs(outcomes),
     account.locale,
@@ -233,15 +304,28 @@ btnTransfer.addEventListener("click", function (e) {
       // Transfer money
       currentAccount.movements.push(-amount);
       receiverAccount.movements.push(amount);
+
+      // Add current date and time
+      currentAccount.movementsDates.push(new Date().toISOString());
+      receiverAccount.movementsDates.push(new Date().toISOString());
       // Update UI
       updateUI(currentAccount);
+
       // Show message
       labelWelcome.textContent = "Transaction successful!";
     }, 3000);
+
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   } else {
     setTimeout(() => {
       labelWelcome.textContent = "Transaction failed!";
     }, 3000);
+
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   }
 });
 
@@ -261,15 +345,26 @@ btnLoan.addEventListener("click", function (e) {
     setTimeout(() => {
       // add positive movement into current account
       currentAccount.movements.push(amount);
+      // Add current time
+      currentAccount.movementsDates.push(new Date().toISOString());
       //update ui
       updateUI(currentAccount);
+
       // message
       labelWelcome.textContent = "loan successful";
     }, 3000);
+
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   } else {
     setTimeout(() => {
       labelWelcome.textContent = "loan not successful";
     }, 3000);
+
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   }
 
   // clear
@@ -302,10 +397,17 @@ btnClose.addEventListener("click", function (e) {
       // sms
       labelWelcome.textContent = "account deleted";
     }, 3000);
+
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   } else {
     setTimeout(() => {
       labelWelcome.textContent = "delete can not be done";
     }, 3000);
+    // log out timer
+    if (timer) clearInterval(timer);
+    timer = logOut();
   }
 
   // clear fileds
@@ -315,7 +417,7 @@ btnClose.addEventListener("click", function (e) {
 
 ///////////////////////////////////////////////////////////////////
 // sort
-////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
 let sortedMove = false;
 
@@ -325,3 +427,33 @@ btnSort.addEventListener("click", function (e) {
   displayMovements(currentAccount, !sortedMove);
   sortedMove = !sortedMove;
 });
+
+/////////////////////////////////////////////////////////////
+// Timer
+/////////////////////////////////////////////////////////////
+
+function logOut() {
+  labelTimer.textContent = "";
+
+  let time = 60;
+
+  const clock = () => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+
+    labelTimer.textContent = `${min}:${sec}`;
+
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = "You've been logged out!";
+      containerApp.style.opacity = 0;
+    }
+    time--;
+  };
+
+  clock();
+
+  timer = setInterval(clock, 1000);
+
+  return timer;
+}
